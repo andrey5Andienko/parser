@@ -17,10 +17,10 @@ class Parser
      */
     protected $client;
 
-    public function __construct(array $urls)
+    public function __construct(array $urls, array $config = [])
     {
         $this->urls = $urls;
-        $this->client = new Client;
+        $this->client = new Client($config);
     }
 
     public function getMetaTags()
