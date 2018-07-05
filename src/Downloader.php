@@ -8,6 +8,9 @@ use GuzzleHttp\Psr7\Response;
 
 class Downloader implements DownloaderInterface
 {
+    /**
+     * @var ClientInterface
+     */
     protected $client;
 
     public function __construct(ClientInterface $client)

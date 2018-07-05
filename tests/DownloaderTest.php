@@ -18,10 +18,10 @@ class DownloaderTest extends TestCase
             ['test' => 'TEST_HEADER'],
             ['test1' => 'TEST_HEADER1'],
         ];
+        $code = 200;
 
-        $mock = new MockHandler([
-            new Response(200, $headers, $body)
-        ]);
+        $setResponse = new Response($code, $headers, $body);
+        $mock = new MockHandler([$setResponse]);
         $handler = HandlerStack::create($mock);
         $client = new Client(['handler' => $handler]);
         $downloader = new Downloader($client);
@@ -31,5 +31,6 @@ class DownloaderTest extends TestCase
         $this->assertSame($body, (string)$response->getBody());
         $this->assertSame($headers[0], $response->getHeaders()[0]);
         $this->assertSame($headers[1], $response->getHeaders()[1]);
+        $this->assertSame($code, $response->getStatusCode());
     }
 }
