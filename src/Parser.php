@@ -2,72 +2,23 @@
 
 namespace App;
 
-use GuzzleHttp\Client;
-use Generator;
-
-class Parser
+class Parser implements MetaTagParserInterface, TagContentParserInterface
 {
-    /**
-     * @var array
-     */
-    protected $urls;
+    protected const META_TAG_PATTERN = '/\<meta.*"(?P<prop>.*)".*"(?P<value>.*)"[^>]*>/';
 
-    /**
-     * @var Client
-     */
-    protected $client;
+    protected const TAG_PATTERN = '/<%s[^>]*>(?P<value>.*)<\/%s>/';
 
-    public function __construct(array $urls, array $config = [])
+    public function getMetaTags(string $content): array
     {
-        $this->urls = $urls;
-        $this->client = new Client($config);
+        preg_match_all(self::META_TAG_PATTERN, $content, $matches);
+
+        return array_combine($matches['prop'], $matches['value']);
     }
 
-    public function getMetaTags()
+    public function getTagContent(string $tag, string $content): array
     {
-        $pattern = '/\<meta.*"(?P<prop>.*)".*"(?P<value>.*)"[^>]*>/';
+        preg_match_all(sprintf(self::TAG_PATTERN, $tag, $tag), $content, $matches);
 
-        foreach ($this->getBodies() as $content) {
-            $url = $content['url'];
-            preg_match_all($pattern, $content['body'], $matches);
-            $meta[$url] = array_combine($matches['prop'], $matches['value']);
-        }
-
-        return $meta;
-    }
-
-    public function getTagContent($tag)
-    {
-        $pattern = '/<' . $tag . '[^>]*>(?P<value>.*)<\/' . $tag . '>/';
-
-        foreach ($this->getBodies() as $content) {
-            $url = $content['url'];
-            preg_match_all($pattern, $content['body'], $matches);
-            $tagContent[$url] = $matches['value'];
-        }
-
-        return $tagContent;
-    }
-
-    protected function sendGetRequest(): Generator
-    {
-        foreach ($this->urls as $url) {
-            yield  [
-                'url' => $url,
-                'response' => $this->client->get($url)
-            ];
-        }
-    }
-
-    protected function getBodies()
-    {
-        $generator = $this->sendGetRequest();
-
-        foreach ($generator as $response) {
-            yield [
-                'url' => $response['url'],
-                'body' => $response['response']->getBody()
-            ];
-        }
+        return $matches['value'];
     }
 }
