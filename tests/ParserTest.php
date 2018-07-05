@@ -7,28 +7,26 @@ use App\Parser;
 
 class ParserTest extends TestCase
 {
-    protected $sites = ['laravel-news.com', 'kramatorsk.info', 'friend-kramatorsk.store', 'kram-hospital.store'];
-
     public function test_get_tag_content()
     {
-        $parser = new Parser($this->sites);
+        $parser = new Parser;
 
-        $tags = $parser->getTagContent('p');
+        $html = "<p>wedfwefwfwef</p>";
 
-        foreach ($tags as $tag) {
-            $this->assertInternalType('array', $tag);
-        }
+        $result = $parser->getTagContent('p', $html);
+
+        $this->assertCount(1, $result);
 
     }
 
     public function test_get_meta_tag()
     {
-        $parser = new Parser($this->sites);
+        $parser = new Parser;
 
-        $tags = $parser->getMetaTags();
+        $meta = "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
 
-        foreach ($tags as $tag) {
-            $this->assertInternalType('array', $tag);
-        }
+        $result = $parser->getMetaTags($meta);
+
+        $this->assertCount(1, $result);
     }
 }
