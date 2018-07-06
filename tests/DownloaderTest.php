@@ -2,35 +2,38 @@
 
 namespace Tests;
 
-use PHPUnit\Framework\TestCase;
 use App\Downloader;
+use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Client;
+use PHPUnit\Framework\TestCase;
 
 class DownloaderTest extends TestCase
 {
+    protected $client;
+
     public function test_download()
     {
-        $body = 'TEST_BODY_SHEET';
-        $headers = [
-            ['test' => 'TEST_HEADER'],
-            ['test1' => 'TEST_HEADER1'],
-        ];
-        $code = 200;
+        $expectedContent = ['1', '2', '3', '4'];
 
-        $setResponse = new Response($code, $headers, $body);
-        $mock = new MockHandler([$setResponse]);
-        $handler = HandlerStack::create($mock);
-        $client = new Client(['handler' => $handler]);
+        $client = $this->getClient($expectedContent);
+
         $downloader = new Downloader($client);
 
-        $response = $downloader->download(['/'])->current();
+        $givenContents = iterator_to_array($downloader->download(['/', '/', '/', '/']));
 
-        $this->assertSame($body, (string)$response->getBody());
-        $this->assertSame($headers[0], $response->getHeaders()[0]);
-        $this->assertSame($headers[1], $response->getHeaders()[1]);
-        $this->assertSame($code, $response->getStatusCode());
+        $this->assertEquals($givenContents, $expectedContent);
+
+    }
+
+    public function getClient(array $contents): Client
+    {
+        $reponses = array_map(function (string $content) {
+            return new Response(200, [], $content);
+        }, $contents);
+
+        $handler = new MockHandler($reponses);
+
+        return new Client(compact('handler'));
     }
 }

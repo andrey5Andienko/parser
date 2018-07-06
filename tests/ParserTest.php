@@ -2,42 +2,33 @@
 
 namespace Tests;
 
-use PHPUnit\Framework\TestCase;
 use App\Parser;
+use PHPUnit\Framework\TestCase;
 
 class ParserTest extends TestCase
 {
     public function test_get_tag_content()
     {
-        $parser = new Parser;
+        $expectedContent = '111111111';
 
-        $html = "<p>111111111111</p>";
+        $html = "<p>" . $expectedContent . "</p>";
 
-        $result = $parser->getTagContent('p', $html);
+        $parser = new Parser($html);
 
-        $this->assertCount(1, $result);
+        $result = $parser->getTagContent('p');
 
-        $html .= PHP_EOL . "<p>222222222222</p>";
-
-        $result2 = $parser->getTagContent('p', $html);
-
-        $this->assertCount(2, $result2);
+        $this->assertSame($expectedContent, $result[0]);
     }
 
     public function test_get_meta_tag()
     {
-        $parser = new Parser;
 
-        $meta = "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+        $meta = "<meta name=\"viewport\" content=\"content\">";
 
-        $result = $parser->getMetaTags($meta);
+        $parser = new Parser($meta);
 
-        $this->assertCount(1, $result);
+        $result = $parser->getMetaTags();
 
-        $meta .= PHP_EOL . "<meta name=\"viewport2\" content=\"width=device-width, initial-scale=2\">";
-
-        $result2 = $parser->getMetaTags($meta);
-
-        $this->assertCount(2, $result2);
+        $this->assertSame('content', $result['viewport']);
     }
 }

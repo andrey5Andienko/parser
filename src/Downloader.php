@@ -2,15 +2,12 @@
 
 namespace App;
 
-use GuzzleHttp\ClientInterface;
 use Generator;
-use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\ClientInterface;
 
 class Downloader implements DownloaderInterface
 {
-    /**
-     * @var ClientInterface
-     */
+    /** @var ClientInterface */
     protected $client;
 
     public function __construct(ClientInterface $client)
@@ -23,7 +20,7 @@ class Downloader implements DownloaderInterface
         foreach ($urls as $url) {
             $response = $this->client->request('GET', $url);
 
-            yield $url => $response;
+            yield $response->getBody();
         }
     }
 }

@@ -8,16 +8,27 @@ class Parser implements MetaTagParserInterface, TagContentParserInterface
 
     protected const TAG_PATTERN = '/<%s[^>]*>(?P<value>.*)<\/%s>/';
 
-    public function getMetaTags(string $content): array
-    {
-        preg_match_all(self::META_TAG_PATTERN, $content, $matches);
+    /** @var string */
+    protected $content;
 
-        return array_combine($matches['prop'], $matches['value']);
+    public function __construct(string $content)
+    {
+        $this->content = $content;
     }
 
-    public function getTagContent(string $tag, string $content): array
+    public function getMetaTags(): array
     {
-        preg_match_all(sprintf(self::TAG_PATTERN, $tag, $tag), $content, $matches);
+        preg_match_all(self::META_TAG_PATTERN, $this->content, $matches);
+
+        if (count($matches['prop']) === count($matches['value'])) {
+
+            return array_combine($matches['prop'], $matches['value']);
+        }
+    }
+
+    public function getTagContent(string $tag): array
+    {
+        preg_match_all(sprintf(self::TAG_PATTERN, $tag, $tag), $this->content, $matches);
 
         return $matches['value'];
     }

@@ -4,5 +4,5 @@ namespace App;
 
 interface MetaTagParserInterface
 {
-    public function getMetaTags(string $content): array;
+    public function getMetaTags(): array;
 }
