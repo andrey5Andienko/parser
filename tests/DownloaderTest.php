@@ -23,16 +23,15 @@ class DownloaderTest extends TestCase
         $givenContents = iterator_to_array($downloader->download(['/', '/', '/', '/']));
 
         $this->assertEquals($givenContents, $expectedContent);
-
     }
 
     public function getClient(array $contents): Client
     {
-        $reponses = array_map(function (string $content) {
+        $responses = array_map(function (string $content) {
             return new Response(200, [], $content);
         }, $contents);
 
-        $handler = new MockHandler($reponses);
+        $handler = new MockHandler($responses);
 
         return new Client(compact('handler'));
     }
